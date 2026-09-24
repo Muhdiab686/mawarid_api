@@ -6,14 +6,17 @@ use App\Actions\Auth\LoginAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\UserResource;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 /**
  * @tags المصادقة
  */
 class AuthController extends Controller
 {
+    use ApiResponse;
+
     /**
      * تسجيل الدخول
      *
@@ -21,14 +24,14 @@ class AuthController extends Controller
      *
      * @unauthenticated
      */
-    public function login(LoginRequest $request, LoginAction $login): array
+    public function login(LoginRequest $request, LoginAction $login): JsonResponse
     {
         $result = $login->execute($request->validated('username'), $request->validated('password'));
 
-        return [
+        return $this->successResponse([
             'token' => $result['token'],
             'user' => UserResource::make($result['user']),
-        ];
+        ], 'تم تسجيل الدخول بنجاح');
     }
 
     /**
@@ -36,11 +39,11 @@ class AuthController extends Controller
      *
      * يلغي التوكن الحالي.
      */
-    public function logout(Request $request): Response
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->noContent();
+        return $this->successResponse(message: 'تم تسجيل الخروج بنجاح');
     }
 
     /**
@@ -48,8 +51,8 @@ class AuthController extends Controller
      *
      * بيانات المستخدم مع دوره وصلاحياته.
      */
-    public function me(Request $request): UserResource
+    public function me(Request $request): JsonResponse
     {
-        return UserResource::make($request->user());
+        return $this->successResponse(UserResource::make($request->user()), 'تم جلب البيانات بنجاح');
     }
 }

@@ -14,6 +14,10 @@ Route::prefix('v1')->name('v1.')->group(function (): void {
         Route::post('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
         Route::get('auth/me', [AuthController::class, 'me'])->name('auth.me');
 
+        Route::get('agencies/dropdown', [AgencyController::class, 'dropdown'])->name('agencies.dropdown');
+        Route::get('agencies/{agency}/sub-agencies/dropdown', [SubAgencyController::class, 'dropdown'])
+            ->name('agencies.sub-agencies.dropdown');
+
         Route::apiResource('agencies', AgencyController::class);
         Route::apiResource('agencies.sub-agencies', SubAgencyController::class)->shallow();
     });

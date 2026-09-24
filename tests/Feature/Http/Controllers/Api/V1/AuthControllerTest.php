@@ -18,11 +18,13 @@ class AuthControllerTest extends TestCase
         $response = $this->postJson(route('v1.auth.login'), ['username' => 'admin', 'password' => 'password']);
 
         $response->assertOk()
-            ->assertJsonPath('user.username', 'admin')
-            ->assertJsonPath('user.role.value', 'senior_admin')
-            ->assertJsonPath('user.role.label', 'إدارة عليا')
-            ->assertJsonPath('user.permissions', array_column(Permission::cases(), 'value'));
-        $this->assertNotEmpty($response->json('token'));
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('message', 'تم تسجيل الدخول بنجاح')
+            ->assertJsonPath('data.user.username', 'admin')
+            ->assertJsonPath('data.user.role.value', 'senior_admin')
+            ->assertJsonPath('data.user.role.label', 'إدارة عليا')
+            ->assertJsonPath('data.user.permissions', array_column(Permission::cases(), 'value'));
+        $this->assertNotEmpty($response->json('data.token'));
     }
 
     public function test_login_rejects_wrong_password_with_422(): void
@@ -64,7 +66,9 @@ class AuthControllerTest extends TestCase
         $user = User::factory()->seniorAdmin()->create();
         $token = $user->createToken('api')->plainTextToken;
 
-        $this->withToken($token)->postJson(route('v1.auth.logout'))->assertNoContent();
+        $this->withToken($token)->postJson(route('v1.auth.logout'))
+            ->assertOk()
+            ->assertJsonPath('message', 'تم تسجيل الخروج بنجاح');
 
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }

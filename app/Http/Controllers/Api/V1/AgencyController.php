@@ -11,25 +11,29 @@ use App\Http\Requests\Agency\StoreAgencyRequest;
 use App\Http\Requests\Agency\UpdateAgencyRequest;
 use App\Http\Requests\PaginatedIndexRequest;
 use App\Http\Resources\AgencyResource;
+use App\Http\Resources\DropdownResource;
 use App\Models\Agency;
+use App\Traits\ApiResponse;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @tags الجهات
  */
 class AgencyController extends Controller implements HasMiddleware
 {
+    use ApiResponse;
+
     /**
      * @return list<Middleware>
      */
     public static function middleware(): array
     {
         return [
-            new Middleware('can:'.Permission::ViewAgencies->value, only: ['index', 'show']),
+            new Middleware('can:'.Permission::ViewAgencies->value, only: ['index', 'dropdown', 'show']),
             new Middleware('can:'.Permission::CreateAgencies->value, only: ['store']),
             new Middleware('can:'.Permission::UpdateAgencies->value, only: ['update']),
             new Middleware('can:'.Permission::DeleteAgencies->value, only: ['destroy']),
@@ -37,9 +41,9 @@ class AgencyController extends Controller implements HasMiddleware
     }
 
     /**
-     * قائمة الجهات
+     * قائمة الجهات (مع تقسيم لصفحات)
      */
-    public function index(PaginatedIndexRequest $request): AnonymousResourceCollection
+    public function index(PaginatedIndexRequest $request): JsonResponse
     {
         $agencies = Agency::query()
             ->withCount(['subAgencies', 'elements'])
@@ -47,15 +51,29 @@ class AgencyController extends Controller implements HasMiddleware
             ->orderBy('id')
             ->paginate($request->perPage());
 
-        return AgencyResource::collection($agencies);
+        return $this->paginatedResponse(AgencyResource::collection($agencies));
+    }
+
+    /**
+     * الجهات للقائمة المنسدلة
+     *
+     * كل الجهات بدون تقسيم لصفحات، `id` و `name` فقط، مرتبة بالاسم.
+     */
+    public function dropdown(): JsonResponse
+    {
+        $agencies = Agency::query()->orderBy('name')->get(['id', 'name']);
+
+        return $this->successResponse(DropdownResource::collection($agencies), 'تم جلب البيانات بنجاح');
     }
 
     /**
      * إضافة جهة
      */
-    public function store(StoreAgencyRequest $request, CreateAgencyAction $createAgency): AgencyResource
+    public function store(StoreAgencyRequest $request, CreateAgencyAction $createAgency): JsonResponse
     {
-        return AgencyResource::make($createAgency->execute($request->validated()));
+        $agency = $createAgency->execute($request->validated());
+
+        return $this->successResponse(AgencyResource::make($agency), 'تمت إضافة الجهة بنجاح', Response::HTTP_CREATED);
     }
 
     /**
@@ -63,20 +81,22 @@ class AgencyController extends Controller implements HasMiddleware
      *
      * مع جهاتها الفرعية.
      */
-    public function show(Agency $agency): AgencyResource
+    public function show(Agency $agency): JsonResponse
     {
         $agency->loadCount(['subAgencies', 'elements'])
             ->load(['subAgencies' => fn ($query) => $query->orderBy('id')]);
 
-        return AgencyResource::make($agency);
+        return $this->successResponse(AgencyResource::make($agency), 'تم جلب البيانات بنجاح');
     }
 
     /**
      * تعديل جهة
      */
-    public function update(UpdateAgencyRequest $request, Agency $agency, UpdateAgencyAction $updateAgency): AgencyResource
+    public function update(UpdateAgencyRequest $request, Agency $agency, UpdateAgencyAction $updateAgency): JsonResponse
     {
-        return AgencyResource::make($updateAgency->execute($agency, $request->validated()));
+        $agency = $updateAgency->execute($agency, $request->validated());
+
+        return $this->successResponse(AgencyResource::make($agency), 'تم تعديل الجهة بنجاح');
     }
 
     /**
@@ -84,10 +104,10 @@ class AgencyController extends Controller implements HasMiddleware
      *
      * حذف ناعم للجهة مع جهاتها الفرعية. يُرفض (422) إذا كانت مرتبطة بعناصر.
      */
-    public function destroy(Agency $agency, DeleteAgencyAction $deleteAgency): Response
+    public function destroy(Agency $agency, DeleteAgencyAction $deleteAgency): JsonResponse
     {
         $deleteAgency->execute($agency);
 
-        return response()->noContent();
+        return $this->successResponse(message: 'تم حذف الجهة بنجاح');
     }
 }

@@ -49,13 +49,30 @@ class AgencyControllerTest extends TestCase
             ->assertJsonPath('data.0.id', $matchingAgency->id)
             ->assertJsonPath('data.0.sub_agencies_count', 2)
             ->assertJsonPath('data.0.elements_count', 1)
-            ->assertJsonPath('meta.total', 1);
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('meta.current_page', 1);
+    }
+
+    public function test_dropdown_returns_all_agencies_sorted_by_name_without_pagination(): void
+    {
+        Agency::factory()->create(['name' => 'مركزي']);
+        Agency::factory()->create(['name' => 'ديوان القيادة']);
+        Agency::factory()->create(['name' => 'فرع المرور']);
+
+        $this->getJson(route('v1.agencies.dropdown'))
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonMissingPath('meta')
+            ->assertJsonPath('data.*.name', ['ديوان القيادة', 'فرع المرور', 'مركزي'])
+            ->assertJsonStructure(['data' => [['id', 'name']]]);
     }
 
     public function test_creates_agency_and_returns_201(): void
     {
         $this->postJson(route('v1.agencies.store'), ['name' => 'مركزي'])
             ->assertCreated()
+            ->assertJsonPath('message', 'تمت إضافة الجهة بنجاح')
             ->assertJsonPath('data.name', 'مركزي');
 
         $this->assertDatabaseHas('agencies', ['name' => 'مركزي']);
@@ -104,7 +121,9 @@ class AgencyControllerTest extends TestCase
         $agency = Agency::factory()->create();
         $subAgency = SubAgency::factory()->for($agency)->create();
 
-        $this->deleteJson(route('v1.agencies.destroy', $agency))->assertNoContent();
+        $this->deleteJson(route('v1.agencies.destroy', $agency))
+            ->assertOk()
+            ->assertJsonPath('message', 'تم حذف الجهة بنجاح');
 
         $this->assertSoftDeleted($agency);
         $this->assertSoftDeleted($subAgency);
@@ -117,6 +136,8 @@ class AgencyControllerTest extends TestCase
 
         $this->deleteJson(route('v1.agencies.destroy', $agency))
             ->assertUnprocessable()
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'لا يمكن حذف الجهة لوجود عناصر مرتبطة بها أو بجهاتها الفرعية.')
             ->assertJsonValidationErrors(['agency' => 'لا يمكن حذف الجهة لوجود عناصر مرتبطة بها أو بجهاتها الفرعية.']);
 
         $this->assertNotSoftDeleted($agency);

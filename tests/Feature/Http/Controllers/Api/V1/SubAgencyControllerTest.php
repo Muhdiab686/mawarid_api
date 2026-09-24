@@ -41,6 +41,19 @@ class SubAgencyControllerTest extends TestCase
             ->assertJsonPath('data.0.id', $subAgency->id);
     }
 
+    public function test_dropdown_returns_only_the_agency_sub_agencies_without_pagination(): void
+    {
+        $agency = Agency::factory()->create();
+        SubAgency::factory()->for($agency)->create(['name' => 'قسم المالية']);
+        SubAgency::factory()->for($agency)->create(['name' => 'الديوان']);
+        SubAgency::factory()->create(['name' => 'قسم العمليات']);
+
+        $this->getJson(route('v1.agencies.sub-agencies.dropdown', $agency))
+            ->assertOk()
+            ->assertJsonMissingPath('meta')
+            ->assertJsonPath('data.*.name', ['الديوان', 'قسم المالية']);
+    }
+
     public function test_creates_sub_agency_under_agency_and_returns_201(): void
     {
         $agency = Agency::factory()->create();
@@ -97,7 +110,9 @@ class SubAgencyControllerTest extends TestCase
     {
         $subAgency = SubAgency::factory()->create();
 
-        $this->deleteJson(route('v1.sub-agencies.destroy', $subAgency))->assertNoContent();
+        $this->deleteJson(route('v1.sub-agencies.destroy', $subAgency))
+            ->assertOk()
+            ->assertJsonPath('message', 'تم حذف الجهة الفرعية بنجاح');
 
         $this->assertSoftDeleted($subAgency);
     }

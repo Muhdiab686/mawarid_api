@@ -10,27 +10,31 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PaginatedIndexRequest;
 use App\Http\Requests\SubAgency\StoreSubAgencyRequest;
 use App\Http\Requests\SubAgency\UpdateSubAgencyRequest;
+use App\Http\Resources\DropdownResource;
 use App\Http\Resources\SubAgencyResource;
 use App\Models\Agency;
 use App\Models\SubAgency;
+use App\Traits\ApiResponse;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @tags الجهات الفرعية
  */
 class SubAgencyController extends Controller implements HasMiddleware
 {
+    use ApiResponse;
+
     /**
      * @return list<Middleware>
      */
     public static function middleware(): array
     {
         return [
-            new Middleware('can:'.Permission::ViewSubAgencies->value, only: ['index', 'show']),
+            new Middleware('can:'.Permission::ViewSubAgencies->value, only: ['index', 'dropdown', 'show']),
             new Middleware('can:'.Permission::CreateSubAgencies->value, only: ['store']),
             new Middleware('can:'.Permission::UpdateSubAgencies->value, only: ['update']),
             new Middleware('can:'.Permission::DeleteSubAgencies->value, only: ['destroy']),
@@ -38,9 +42,9 @@ class SubAgencyController extends Controller implements HasMiddleware
     }
 
     /**
-     * الجهات الفرعية لجهة
+     * الجهات الفرعية لجهة (مع تقسيم لصفحات)
      */
-    public function index(PaginatedIndexRequest $request, Agency $agency): AnonymousResourceCollection
+    public function index(PaginatedIndexRequest $request, Agency $agency): JsonResponse
     {
         $subAgencies = $agency->subAgencies()
             ->withCount('elements')
@@ -48,15 +52,29 @@ class SubAgencyController extends Controller implements HasMiddleware
             ->orderBy('id')
             ->paginate($request->perPage());
 
-        return SubAgencyResource::collection($subAgencies);
+        return $this->paginatedResponse(SubAgencyResource::collection($subAgencies));
+    }
+
+    /**
+     * الجهات الفرعية لجهة للقائمة المنسدلة
+     *
+     * كل الجهات الفرعية للجهة بدون تقسيم لصفحات، `id` و `name` فقط، مرتبة بالاسم.
+     */
+    public function dropdown(Agency $agency): JsonResponse
+    {
+        $subAgencies = $agency->subAgencies()->orderBy('name')->get(['id', 'name']);
+
+        return $this->successResponse(DropdownResource::collection($subAgencies), 'تم جلب البيانات بنجاح');
     }
 
     /**
      * إضافة جهة فرعية
      */
-    public function store(StoreSubAgencyRequest $request, Agency $agency, CreateSubAgencyAction $createSubAgency): SubAgencyResource
+    public function store(StoreSubAgencyRequest $request, Agency $agency, CreateSubAgencyAction $createSubAgency): JsonResponse
     {
-        return SubAgencyResource::make($createSubAgency->execute($agency, $request->validated()));
+        $subAgency = $createSubAgency->execute($agency, $request->validated());
+
+        return $this->successResponse(SubAgencyResource::make($subAgency), 'تمت إضافة الجهة الفرعية بنجاح', Response::HTTP_CREATED);
     }
 
     /**
@@ -64,9 +82,9 @@ class SubAgencyController extends Controller implements HasMiddleware
      *
      * مع جهتها الرئيسية.
      */
-    public function show(SubAgency $subAgency): SubAgencyResource
+    public function show(SubAgency $subAgency): JsonResponse
     {
-        return SubAgencyResource::make($subAgency->loadCount('elements')->load('agency'));
+        return $this->successResponse(SubAgencyResource::make($subAgency->loadCount('elements')->load('agency')), 'تم جلب البيانات بنجاح');
     }
 
     /**
@@ -74,9 +92,11 @@ class SubAgencyController extends Controller implements HasMiddleware
      *
      * يمكن نقلها لجهة رئيسية أخرى بإرسال `agency_id`، وتنتقل عناصرها معها.
      */
-    public function update(UpdateSubAgencyRequest $request, SubAgency $subAgency, UpdateSubAgencyAction $updateSubAgency): SubAgencyResource
+    public function update(UpdateSubAgencyRequest $request, SubAgency $subAgency, UpdateSubAgencyAction $updateSubAgency): JsonResponse
     {
-        return SubAgencyResource::make($updateSubAgency->execute($subAgency, $request->validated()));
+        $subAgency = $updateSubAgency->execute($subAgency, $request->validated());
+
+        return $this->successResponse(SubAgencyResource::make($subAgency), 'تم تعديل الجهة الفرعية بنجاح');
     }
 
     /**
@@ -84,10 +104,10 @@ class SubAgencyController extends Controller implements HasMiddleware
      *
      * حذف ناعم. يُرفض (422) إذا كانت مرتبطة بعناصر.
      */
-    public function destroy(SubAgency $subAgency, DeleteSubAgencyAction $deleteSubAgency): Response
+    public function destroy(SubAgency $subAgency, DeleteSubAgencyAction $deleteSubAgency): JsonResponse
     {
         $deleteSubAgency->execute($subAgency);
 
-        return response()->noContent();
+        return $this->successResponse(message: 'تم حذف الجهة الفرعية بنجاح');
     }
 }
