@@ -2,9 +2,12 @@
 
 namespace App\Enums;
 
-enum UserRole: string
+use App\Interfaces\HasLabel;
+
+enum UserRole: string implements HasLabel
 {
     case SuperAdmin = 'super_admin';
+    case SeniorAdmin = 'senior_admin';
     case TelegramAdmin = 'telegram_admin';
     case AttendanceAdmin = 'attendance_admin';
     case MartyrsAdmin = 'martyrs_admin';
@@ -20,6 +23,7 @@ enum UserRole: string
     {
         return match ($this) {
             self::SuperAdmin => 'مدير النظام',
+            self::SeniorAdmin => 'إدارة عليا',
             self::TelegramAdmin => 'مسؤول البرقيات',
             self::AttendanceAdmin => 'مسؤول الدوام',
             self::MartyrsAdmin => 'مسؤول الشهداء والجرحى',

@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum DefectStatus: string
+use App\Interfaces\HasLabel;
+
+enum DefectStatus: string implements HasLabel
 {
     case Conscript = 'conscript';
     case Volunteer = 'volunteer';

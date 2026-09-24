@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum SalaryStatus: string
+use App\Interfaces\HasLabel;
+
+enum SalaryStatus: string implements HasLabel
 {
     case FullSalary = 'full_salary';
 

@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum MaritalStatus: string
+use App\Interfaces\HasLabel;
+
+enum MaritalStatus: string implements HasLabel
 {
     case Single = 'single';
     case Married = 'married';

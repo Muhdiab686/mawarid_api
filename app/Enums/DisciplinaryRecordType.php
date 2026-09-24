@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum DisciplinaryRecordType: string
+use App\Interfaces\HasLabel;
+
+enum DisciplinaryRecordType: string implements HasLabel
 {
     case Punishment = 'punishment';
     case Reward = 'reward';

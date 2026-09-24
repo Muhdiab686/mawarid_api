@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum WorkNature: string
+use App\Interfaces\HasLabel;
+
+enum WorkNature: string implements HasLabel
 {
     case Administrative = 'administrative';
     case Overnight = 'overnight';

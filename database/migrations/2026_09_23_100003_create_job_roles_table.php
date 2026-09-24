@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('job_roles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('job_title_id')->constrained()->cascadeOnDelete();
-            $table->enum('work_nature', ['administrative', 'overnight', 'resident_administrative', 'field']);
+            $table->string('work_nature');
             $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();

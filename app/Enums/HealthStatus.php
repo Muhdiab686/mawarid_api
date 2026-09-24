@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum HealthStatus: string
+use App\Interfaces\HasLabel;
+
+enum HealthStatus: string implements HasLabel
 {
     case Healthy = 'healthy';
     case TransientIllness = 'transient_illness';

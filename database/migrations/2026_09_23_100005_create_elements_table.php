@@ -25,7 +25,7 @@ return new class extends Migration
             $table->date('birth_date')->nullable();
             $table->string('grandfather_name')->nullable();
             $table->string('mother_name')->nullable();
-            $table->string('nationality')->default('syrian');
+            $table->enum('nationality', ['syrian', 'palestinian_syrian', 'palestinian', 'jordanian', 'tunisian'])->default('syrian');
             $table->string('religion')->nullable();
             $table->string('sect')->nullable();
             $table->string('national_id')->nullable()->unique();
@@ -57,8 +57,8 @@ return new class extends Migration
             $table->text('experience_summary')->nullable();
             $table->text('academic_courses')->nullable();
             $table->text('military_courses')->nullable();
-            $table->enum('status', ['active'])->nullable()->default('active');
-            $table->enum('health_status', ['healthy', 'transient_illness', 'chronic_illness', 'work_injury'])->nullable()->default('healthy');
+            $table->enum('status', ['active', 'contracted_civilian', 'desertion_telegram', 'dismissed', 'sick_leave', 'external_transfer', 'work_suspension', 'suspended_from_duty', 'imprisoned', 'administrative_leave', 'martyr', 'resigned', 'chronically_ill', 'wounded', 'crime_telegram'])->nullable()->default('active');
+            $table->string('health_status')->nullable();
             $table->decimal('residence_lat', 10, 7)->nullable()->comment('Residence latitude');
             $table->decimal('residence_lng', 10, 7)->nullable()->comment('Residence longitude');
             $table->decimal('work_lat', 10, 7)->nullable()->comment('Workplace latitude');

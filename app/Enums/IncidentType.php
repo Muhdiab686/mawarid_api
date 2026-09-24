@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum IncidentType: string
+use App\Interfaces\HasLabel;
+
+enum IncidentType: string implements HasLabel
 {
     case Martyr = 'martyr';
     case Wounded = 'wounded';

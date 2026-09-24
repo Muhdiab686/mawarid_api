@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum EducationLevel: string
+use App\Interfaces\HasLabel;
+
+enum EducationLevel: string implements HasLabel
 {
     case Illiterate = 'illiterate';
     case Primary = 'primary';

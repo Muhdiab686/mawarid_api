@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum LeaveType: string
+use App\Interfaces\HasLabel;
+
+enum LeaveType: string implements HasLabel
 {
     case Medical = 'medical';
     case Administrative = 'administrative';
