@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('element_id')->constrained()->cascadeOnDelete();
             $table->string('problem_title');
-            $table->enum('condition_type', ['سليم', 'مرض عابر', 'مرض مزمن', 'إصابة عمل']);
+            $table->enum('condition_type', ['healthy', 'transient_illness', 'chronic_illness', 'work_injury']);
             $table->text('condition_description');
             $table->text('assistance_provided')->nullable();
             $table->string('document_path')->nullable();

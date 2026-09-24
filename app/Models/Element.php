@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Enums\EducationLevel;
+use App\Enums\ElementStatus;
 use App\Enums\Gender;
+use App\Enums\HealthStatus;
 use App\Enums\MaritalStatus;
 use App\Enums\WorkNature;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -96,6 +98,8 @@ class Element extends Model
             'work_lat' => 'decimal:7',
             'work_lng' => 'decimal:7',
             'distance_km' => 'decimal:2',
+            'status' => ElementStatus::class,
+            'health_status' => HealthStatus::class,
         ];
     }
 

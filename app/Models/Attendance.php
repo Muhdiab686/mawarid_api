@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SalaryStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,7 @@ class Attendance extends Model
         return [
             'absence_days' => 'integer',
             'is_continuous' => 'boolean',
+            'salary_status' => SalaryStatus::class,
         ];
     }
 

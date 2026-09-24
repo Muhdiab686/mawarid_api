@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('leaves', function (Blueprint $table) {
             $table->id();
             $table->foreignId('element_id')->constrained()->cascadeOnDelete();
-            $table->enum('leave_type', ['إجازة طبية', 'إجازة إدارية', 'اجازة بدون راتب', 'اجازة دراسية', 'اجازة خارجية', 'اجازة امومة']);
+            $table->enum('leave_type', ['medical', 'administrative', 'unpaid', 'study', 'external', 'maternity']);
             $table->string('leave_number');
             $table->date('start_date');
             $table->date('end_date');

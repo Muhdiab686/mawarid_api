@@ -2,10 +2,9 @@
 
 namespace App\Enums;
 
-enum Gender: string
+enum ElementStatus: string
 {
-    case Male = 'male';
-    case Female = 'female';
+    case Active = 'active';
 
     /**
      * Get the Arabic label for display.
@@ -13,8 +12,7 @@ enum Gender: string
     public function label(): string
     {
         return match ($this) {
-            self::Male => 'ذكر',
-            self::Female => 'أنثى',
+            self::Active => 'نشط',
         };
     }
 }

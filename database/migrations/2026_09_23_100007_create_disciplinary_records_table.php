@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('disciplinary_records', function (Blueprint $table) {
             $table->id();
             $table->foreignId('element_id')->constrained()->cascadeOnDelete();
-            $table->enum('record_type', ['عقوبة', 'مكافأة', 'إنذار']);
+            $table->enum('record_type', ['punishment', 'reward', 'warning']);
             $table->string('decision_number');
             $table->string('action_type');
             $table->date('decision_date');

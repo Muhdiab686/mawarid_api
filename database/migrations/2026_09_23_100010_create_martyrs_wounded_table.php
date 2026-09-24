@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('martyrs_wounded', function (Blueprint $table) {
             $table->id();
             $table->foreignId('element_id')->constrained()->cascadeOnDelete();
-            $table->enum('incident_type', ['شهيد', 'جريح', 'سجين']);
+            $table->enum('incident_type', ['martyr', 'wounded', 'prisoner']);
             $table->date('incident_date');
             $table->string('incident_number')->nullable();
             $table->text('incident_description');

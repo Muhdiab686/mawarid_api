@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\MedicalConditionType;
+use App\Enums\HealthStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,7 +29,7 @@ class MedicalRecord extends Model
     protected function casts(): array
     {
         return [
-            'condition_type' => MedicalConditionType::class,
+            'condition_type' => HealthStatus::class,
         ];
     }
 

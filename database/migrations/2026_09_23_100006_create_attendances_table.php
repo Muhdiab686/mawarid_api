@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('month_year');
             $table->integer('absence_days')->default(0);
             $table->boolean('is_continuous')->default(false);
-            $table->string('salary_status')->default('راتب كامل');
+            $table->enum('salary_status', ['full_salary'])->default('full_salary');
             $table->timestamps();
 
             $table->unique(['element_id', 'month_year']);

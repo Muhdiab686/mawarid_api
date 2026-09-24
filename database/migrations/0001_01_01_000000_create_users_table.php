@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('username')->unique();
             $table->string('password');
-            $table->string('role_type');
+            $table->enum('role_type', ['super_admin', 'telegram_admin', 'attendance_admin', 'martyrs_admin', 'medical_admin', 'logistics_admin', 'dashboard_viewer', 'agency_admin']);
             $table->foreignId('agency_id')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

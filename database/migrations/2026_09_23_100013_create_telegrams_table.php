@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreignId('new_sub_agency_id')->nullable()->constrained('sub_agencies');
             $table->string('document_path')->nullable();
             $table->text('notes')->nullable();
-            $table->text('additional_notes')->nullable()->comment('ملاحظات إضافية');
+            $table->text('additional_notes')->nullable()->comment('Additional notes');
             $table->timestamps();
             $table->softDeletes();
         });
