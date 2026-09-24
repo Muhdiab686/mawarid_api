@@ -34,6 +34,24 @@ class UserFactory extends Factory
     }
 
     /**
+     * Give the user the given role.
+     */
+    public function role(UserRole $role): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role_type' => $role,
+        ]);
+    }
+
+    /**
+     * Give the user full access (senior administration).
+     */
+    public function seniorAdmin(): static
+    {
+        return $this->role(UserRole::SeniorAdmin);
+    }
+
+    /**
      * Indicate that the user is inactive.
      */
     public function inactive(): static

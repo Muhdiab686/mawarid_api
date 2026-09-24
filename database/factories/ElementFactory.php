@@ -1,0 +1,27 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Agency;
+use App\Models\Element;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Element>
+ */
+class ElementFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'agency_id' => Agency::factory(),
+            'self_number' => fake()->unique()->numerify('########'),
+            'full_name' => fake()->name(),
+        ];
+    }
+}

@@ -17,6 +17,29 @@ enum UserRole: string implements HasLabel
     case AgencyAdmin = 'agency_admin';
 
     /**
+     * Get the permissions granted to this role.
+     *
+     * Only the senior administration has access for now; the other roles
+     * receive their permissions in the project's final phase.
+     *
+     * @return list<Permission>
+     */
+    public function permissions(): array
+    {
+        return match ($this) {
+            self::SeniorAdmin => Permission::cases(),
+            self::SuperAdmin => [],
+            self::TelegramAdmin => [],
+            self::AttendanceAdmin => [],
+            self::MartyrsAdmin => [],
+            self::MedicalAdmin => [],
+            self::LogisticsAdmin => [],
+            self::DashboardViewer => [],
+            self::AgencyAdmin => [],
+        };
+    }
+
+    /**
      * Get the Arabic label for display.
      */
     public function label(): string

@@ -8,7 +8,9 @@ use App\Enums\Gender;
 use App\Enums\MaritalStatus;
 use App\Enums\Nationality;
 use App\Enums\WorkNature;
+use Database\Factories\ElementFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -69,7 +71,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 ])]
 class Element extends Model
 {
-    use SoftDeletes;
+    /** @use HasFactory<ElementFactory> */
+    use HasFactory, SoftDeletes;
 
     /**
      * Get the attributes that should be cast.

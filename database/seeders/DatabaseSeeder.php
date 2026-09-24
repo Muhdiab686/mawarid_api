@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'username' => 'admin',
-            'role_type' => UserRole::SuperAdmin,
+            'role_type' => UserRole::SeniorAdmin,
         ]);
     }
 }
